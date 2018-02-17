@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-	<form method="post" action="LoginServlet" class="login">
+	<form method="get" action="MainServlet" class="login">
 		<p>
 			<label for="login">Email:</label> <input type="text" name="login"
 				id="login" value="Enter your login">
@@ -28,6 +28,7 @@
 			<c:out value="${errorPassword}" />
 		</p>
 		<p class="login-submit">
+		<input type="hidden" name="action"	value="check_login"/>
 			<button type="submit" class="login-button">Login</button>
 		</p>
 		

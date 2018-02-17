@@ -80,21 +80,21 @@ public class UserDaoImpl implements UserDao{
 	}
 
 	@Override
-	public boolean checkPassword(String user_login, String user_password) {
-		boolean result = false;
+	public int checkPassword(String user_login, String user_password) {
+		int result = 2;
 		User user = null;
 		String url = getConnectInitValue()[0];
 		String login = getConnectInitValue()[1];
 		String pass = getConnectInitValue()[2];
 		
 		try (Connection connection = DriverManager.getConnection(url, login, pass)){
-			PreparedStatement st = connection.prepareStatement("SELECT password FROM users WHERE login = ?;");
+			PreparedStatement st = connection.prepareStatement("SELECT password, role FROM users WHERE login = ?;");
 			st.setString(1, user_login);
 			ResultSet rs = st.executeQuery();
 			rs.next();
 			if (rs.getString("password")!=null) {
 				if (rs.getString("password").equals(user_password)) {
-					result = true;
+					result = rs.getInt("role");
 				}
 			} 
 		} catch (SQLException e) {
@@ -113,6 +113,12 @@ public class UserDaoImpl implements UserDao{
 
 		return new String[] { dbURL, login, pass, drvName };
 
+	}
+
+	@Override
+	public Entity read(String s) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

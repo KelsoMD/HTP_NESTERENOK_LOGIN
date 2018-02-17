@@ -11,17 +11,23 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-	Loged Sucsessfully!
-	
+User Logged!
 	<c:out value="${user_name}" />
-
-
 	<c:forEach items="${list}" var="item">
 		<p><c:out value="${item}" /></p>
 	</c:forEach>
-
-
-
+	
+	<form method="get" action="MainServlet" class="sign-up">
+		<h1 class="sign-up-title">Books list</h1>
+		<input type="text" class="sign-up-input"
+			placeholder="Enter book title" autofocus name="title">
+			<input type="hidden" name="action" value="find_book" />
+		<input type="submit" value="Find book" class="sign-up-button">
+		<br/>
+		<c:out value="${book}"/>
+			
+	</form>
+	
+	
 </body>
 </html>

@@ -1,6 +1,7 @@
 package by.htp.login.controller;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -44,7 +45,10 @@ public class RegistrationServlet extends HttpServlet {
 		String login = request.getParameter("login");
 		String password = request.getParameter("password");
 		BaseAction act = ActionManager.defineAction("Registration");
-		String result = act.act(request);
+		String result;
+		try {
+			result = act.act(request);
+		
 		if (result.equals("false")) {
 			request.setAttribute("errorLogin", "Incorrect login");
 			RequestDispatcher dispatcher = request.getRequestDispatcher(registerPage);
@@ -53,5 +57,13 @@ public class RegistrationServlet extends HttpServlet {
 			RequestDispatcher dispatcher = request.getRequestDispatcher(welcomePage);
 			dispatcher.forward(request, response);
 		}
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 }

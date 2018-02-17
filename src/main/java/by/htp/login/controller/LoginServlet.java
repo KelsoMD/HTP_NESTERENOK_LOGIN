@@ -1,6 +1,7 @@
 package by.htp.login.controller;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,21 +59,28 @@ public class LoginServlet extends HttpServlet {
 		String password = request.getParameter("password");
 		BaseAction act = ActionManager.defineAction("CheckLogin");
 		String actResponce;
-		actResponce = act.act(request);
-		if (act != null && actResponce.equals("sucsess")) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher(welcomePage);
-			dispatcher.forward(request, response);
-		}
+		try {
+			actResponce = act.act(request);
+		
 		if (act != null && actResponce.equals("Incorrect password")) {
 			request.setAttribute("errorLogin", "Incorrect password");
 			RequestDispatcher dispatcher = request.getRequestDispatcher(pageSecond);
 			dispatcher.forward(request, response);
 
-		}
-		if (act != null && actResponce.equals("Incorrect login")) {
+		} else if (act != null && actResponce.equals("Incorrect login")) {
 			request.setAttribute("errorLogin", "Incorrect login");
 			RequestDispatcher dispatcher = request.getRequestDispatcher(pageSecond);
 			dispatcher.forward(request, response);
+		} else {
+			RequestDispatcher dispatcher = request.getRequestDispatcher(actResponce);
+			dispatcher.forward(request, response);
+		}
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		// if (param.equals("test")) {

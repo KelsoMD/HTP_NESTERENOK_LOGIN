@@ -1,15 +1,20 @@
 package by.htp.login.dao;
 
+import java.io.IOException;
+import java.text.ParseException;
+
 import by.htp.login.beans.Entity;
 
-public interface BaseDao {
+public interface BaseDao<T extends Entity> {
 
-	public void create(Entity e);
+	public void create(T t) throws IOException;
 	
-	public Entity read(int id);
+	public T read(int id) throws NumberFormatException, IOException, ParseException;
 	
-	public void update(Entity e);
+	public T read(String s);
 	
-	public void delete(int id);
+	public void update(T t);
+	
+	public void delete(int id) throws NumberFormatException, IOException, ParseException;
 		
 }
