@@ -12,7 +12,7 @@
 </head>
 <body>
 
-	Admin logqed!
+	Admin logged!
 	<form method="get" action="MainServlet" class="sign-up">
 		<h1 class="sign-up-title">Books list</h1>
 		<input type="hidden" name="action" value="view_books" /> <input
@@ -21,6 +21,8 @@
 			<c:forEach items="${list}" var="item">
 		<p>
 			<c:out value="${item}" />
+			<a href="http://localhost:8080/login/MainServlet?action=delete_book&book_id=${item.getId()}" class="design">delete</a>
+			<a href="http://localhost:8080/login/MainServlet?action=edit_book&book_id=${item.getId()}" class="design">edit</a>
 		</p>
 	</c:forEach>
 	</form>
@@ -36,10 +38,22 @@
 			<label for="title">Title:</label> <input type="text" name="title"
 				id="title" value="Enter title">
 		</p>
-		<p>
+		<!-- <p>
 			<label for="authorid">Author ID:</label> <input type="text"
 				name="authorid" id="authorid" value="Enter Author ID">
-		</p>
+		</p> -->
+		
+		
+		<p><select id="authors" name="authors" >
+          <c:forEach var="author" items="${authors}">
+            <option value="${author.getId()}">${author}</option>
+          </c:forEach>
+        </select></p>
+        <p>
+        <br/>
+        <br/>
+		<br/>
+        
 		
 		<input type="hidden" name="action" value="add_book" /> <input
 			type="submit" value="Add Book" class="sign-up-button">

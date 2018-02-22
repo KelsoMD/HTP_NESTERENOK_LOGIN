@@ -3,12 +3,15 @@ package by.htp.login.dao.database;
 import java.io.IOException;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +39,7 @@ public class BookDaoMySqlImpl implements BookDao {
 		String[] newBook = new String[2];
 		newBook[0] = book.getTitle();
 		newBook[1] = ""+book.getAuthor().getId();
-		String insert = "insert into book (title, author) values (?, ?)";
+		String insert = "insert into book (title, author, publish_year) values (?, ?, ?)";
 		try {
 			String url = getConnectInitValue()[0];
 			String login = getConnectInitValue()[1];
@@ -47,6 +50,7 @@ public class BookDaoMySqlImpl implements BookDao {
 			PreparedStatement prst = connection.prepareStatement(insert);
 			prst.setString(1, newBook[0]);
 			prst.setInt(2, Integer.parseInt(newBook[1]));
+			prst.setDate(3, (Date) book.getPublishDate());
 			prst.executeUpdate();
 
 		} catch (SQLException e1) {
@@ -85,6 +89,7 @@ public class BookDaoMySqlImpl implements BookDao {
 			int authorId = rs1.getInt("author");
 			String title = rs1.getString("title");
 			int bookId = rs1.getInt("book_id");
+			Date publishYear = rs1.getDate("publish_year");
 
 			PreparedStatement ps2 = connection.prepareStatement(sql2);
 			ps2.setInt(1, authorId);
@@ -92,7 +97,7 @@ public class BookDaoMySqlImpl implements BookDao {
 			rs2.next();
 			Author author = new Author(rs2.getInt("author_id"), rs2.getString("name"), rs2.getString("surname"),
 					rs2.getDate("birth_date"));
-			book = new Book(bookId, title, author);
+			book = new Book(bookId, title, author, publishYear);
 			connection.commit();
 		} catch (SQLException e) {
 			try {
@@ -115,16 +120,22 @@ public class BookDaoMySqlImpl implements BookDao {
 	@Override
 	public void update(Book entity) {
 		Connection connection = null;
-		String sql = "UPDATE book SET title = ?, author = ?;";
+		String sql = "UPDATE book SET title = ?, author = ?, publish_year = ? WHERE book_id =?";
 		try {
 			String url = getConnectInitValue()[0];
 			String login = getConnectInitValue()[1];
 			String pass = getConnectInitValue()[2];
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			String strDate = sdf.format(entity.getPublishDate());
+			Date sqlDate = Date.valueOf(strDate);
 
 			connection = DriverManager.getConnection(url, login, pass);
 			PreparedStatement prst = connection.prepareStatement(sql);
 			prst.setString(1, entity.getTitle());
 			prst.setInt(2, entity.getAuthor().getId());
+			prst.setDate(3, sqlDate);
+			prst.setInt(4, entity.getId());
 			prst.executeUpdate();
 
 		} catch (SQLException e) {
@@ -145,7 +156,7 @@ public class BookDaoMySqlImpl implements BookDao {
 	@Override
 	public void delete(int id) throws NumberFormatException, IOException, ParseException {
 		Connection connection = null;
-		String insert = "delete from book where bookid = ?";
+		String insert = "delete from book where book_id = ?";
 		try {
 			String url = getConnectInitValue()[0];
 			String login = getConnectInitValue()[1];
@@ -195,7 +206,7 @@ public class BookDaoMySqlImpl implements BookDao {
 			Statement st2 = connection.createStatement();
 			ResultSet rs2 = st2.executeQuery("SELECT * FROM book;");
 			while (rs2.next()) {
-				list.add(new Book(rs2.getInt("book_id"), rs2.getString("title"), authorMap.get(rs2.getInt("author"))));
+				list.add(new Book(rs2.getInt("book_id"), rs2.getString("title"), authorMap.get(rs2.getInt("author")), rs2.getDate("publish_year")));
 			}
 			connection.commit();
 		} catch (SQLException e1) {
@@ -249,6 +260,7 @@ public class BookDaoMySqlImpl implements BookDao {
 			int authorId = rs1.getInt("author");
 			String title = rs1.getString("title");
 			int bookId = rs1.getInt("book_id");
+			Date publishYear = rs1.getDate("publish_year");
 
 			PreparedStatement ps2 = connection.prepareStatement(sql2);
 			ps2.setInt(1, authorId);
@@ -256,7 +268,7 @@ public class BookDaoMySqlImpl implements BookDao {
 			rs2.next();
 			Author author = new Author(rs2.getInt("author_id"), rs2.getString("name"), rs2.getString("surname"),
 					rs2.getDate("birth_date"));
-			book = new Book(bookId, title, author);
+			book = new Book(bookId, title, author, publishYear);
 			connection.commit();
 		} catch (SQLException e) {
 			try {
