@@ -8,20 +8,16 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-<p class="about">Hello user!</p>
-
-	<form action="LoginServlet" method="get" class="about">
-		<input type="hidden" name="action" value="login" />
-		<input type="submit" value="Login" />
-	</form>
-	<form action="RegistrationServlet" method="get" class="about">
-		<input type="hidden" name="action" value="registration" />
-		<input type="submit" value="registration" />
-	</form>
-	
-	
-	
+<ul class="menu">
+		<li><a href="http://localhost:8080/login/MainServlet?action=main_page">Главная</a></li>
+		<li><a href="">Действия</a>
+			<ul>
+				<li><a href="http://localhost:8080/login/MainServlet?action=view_books">Список книг</a></li>
+			</ul></li>
+		<li><a href="http://localhost:8080/login/MainServlet?action=switch_login">Login</a></li>
+			<li><a href="http://localhost:8080/login/registerandcard.jsp">Register</a></li>
+	</ul>
+	<br />
 	
 </body>
 </html>

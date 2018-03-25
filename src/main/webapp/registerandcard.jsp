@@ -25,9 +25,33 @@
 		</div>
 		<div>
 			<label>Пароль</label> <input type="password" name="password" value="${password}">
+			<c:out value="${pass_msg}"></c:out>
 		</div>
 		<div>
-			<button type="submit" name="action" value="registration">Зарегистрироваться</button>
+			<label>Имя</label> <input type="text" name="name">
+			<c:out value="${name_msg}"></c:out>
+		</div>
+		<div>
+			<label>Отчество</label> <input type="text" name="lastname">
+			<c:out value="${lastname_msg}"></c:out>
+		</div>
+		<div>
+			<label>Фамилия</label> <input type="text" name="surname">
+			<c:out value="${surname_msg}"></c:out>
+		</div>
+		<div>
+			<label>Дата рождения</label> <input type="date" name="birth_date">
+		</div>
+		<div>
+			<label>Телефонный номер</label> <input type="text" placeholder="+3475(ХХ)ХХХ ХХ ХХ" name="number">
+			<c:out value="${number_msg}"></c:out>
+		</div>
+		<div>
+			<label>E-mail</label> <input type="text" name="e_mail">
+			<c:out value="${eMail_msg}"></c:out>
+		</div>
+		<div>
+			<button type="submit" name="action" value="regandcard">Зарегистрироваться</button>
 		</div>
 	</form>
 

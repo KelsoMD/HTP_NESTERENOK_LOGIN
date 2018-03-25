@@ -2,7 +2,7 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
   <display-name>index</display-name>
   <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>index_new.jsp</welcome-file>
   </welcome-file-list>
   <servlet>
     <servlet-name>LoginServlet</servlet-name>
@@ -32,4 +32,19 @@
     <servlet-name>MainServlet</servlet-name>
     <url-pattern>/MainServlet</url-pattern>
   </servlet-mapping>
+  
+  <filter>
+    <filter-name>Encoding Filter</filter-name>
+    <filter-class>by.htp.login.barrier.EncodingFilter</filter-class>
+      <init-param>
+        <param-name>requestEncoding</param-name>
+        <param-value>UTF8</param-value>
+      </init-param>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>Encoding Filter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
 </web-app>
