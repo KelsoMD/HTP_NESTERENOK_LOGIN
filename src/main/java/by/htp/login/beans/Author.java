@@ -10,16 +10,20 @@ public class Author extends Entity {
 
 	public Author() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public Author(int id) {
 		super(id);
-		// TODO Auto-generated constructor stub
 	}
 
 	public Author(int id, String name, String surName, Date birthDate) {
 		super(id);
+		this.name = name;
+		this.surName = surName;
+		this.birthDate = birthDate;
+	}
+	
+	public Author(String name, String surName, Date birthDate) {
 		this.name = name;
 		this.surName = surName;
 		this.birthDate = birthDate;

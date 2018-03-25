@@ -10,18 +10,21 @@ public class Book extends Entity {
 
 	public Book() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public Book(int id) {
 		super(id);
-		// TODO Auto-generated constructor stub
 	}
 
 	
 
 	public Book(int id, String title, Author author, Date publishDate) {
 		super(id);
+		this.title = title;
+		this.author = author;
+		this.publishDate = publishDate;
+	}
+	public Book(String title, Author author, Date publishDate) {
 		this.title = title;
 		this.author = author;
 		this.publishDate = publishDate;

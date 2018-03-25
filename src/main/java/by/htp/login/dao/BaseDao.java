@@ -9,12 +9,10 @@ public interface BaseDao<T extends Entity> {
 
 	public void create(T t) throws IOException;
 	
-	public T read(int id) throws NumberFormatException, IOException, ParseException;
-	
-	public T read(String s);
+	public T read(int id) throws IOException, ParseException;
 	
 	public void update(T t);
 	
-	public void delete(int id) throws NumberFormatException, IOException, ParseException;
+	public void delete(int id) throws IOException, ParseException;
 		
 }

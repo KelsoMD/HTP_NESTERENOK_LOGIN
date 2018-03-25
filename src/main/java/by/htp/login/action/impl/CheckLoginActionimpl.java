@@ -1,42 +1,54 @@
 package by.htp.login.action.impl;
 
-import java.util.List;
+import static by.htp.login.action.util.ManagerConstantPool.PAGE_LOGIN;
+import static by.htp.login.action.util.ManagerConstantPool.PAGE_SUCSESS_RD;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import by.htp.login.action.BaseAction;
-import by.htp.login.beans.Author;
-import by.htp.login.dao.AuthorDao;
-import by.htp.login.dao.UserDao;
-import by.htp.login.dao.database.AuthorDaoimpl;
-import by.htp.login.dao.database.UserDaoImpl;
+import by.htp.login.beans.User;
+import by.htp.login.service.AuthorService;
+import by.htp.login.service.BookService;
+import by.htp.login.service.OrderService;
+import by.htp.login.service.UserService;
+import by.htp.login.service.impl.AuthorServiceImpl;
+import by.htp.login.service.impl.BookServiceImpl;
+import by.htp.login.service.impl.OrderServiceImpl;
+import by.htp.login.service.impl.UserServiceImpl;
 
 public class CheckLoginActionimpl implements BaseAction {
 
-	private UserDao dao = new UserDaoImpl();
-	private AuthorDao dao1 = new AuthorDaoimpl();
+	UserService us = new UserServiceImpl();
+	AuthorService as = new AuthorServiceImpl();
+	BookService bs = new BookServiceImpl();
+	OrderService os = new OrderServiceImpl();
 
 	@Override
 	public String act(HttpServletRequest request) {
-		String page = "";
-		if (dao.checkLogin(request.getParameter("login"))) {
-			int result = dao.checkPassword(request.getParameter("login"), request.getParameter("password"));
-			if (result == 0) {
-				page = "/second.jsp";
-			}
-			if (result == 1) {
-				List<Author> authors = dao1.readAll();
-				request.setAttribute("authors", authors);
-				page = "/secondadmin.jsp";
-			}
-			if (result == 3) {
+
+		String login = request.getParameter("login");
+		String pass = request.getParameter("password");
+		HttpSession session = request.getSession(true);
+		
+		if (us.checkLogin(login)) {
+			User user = us.checkPassword(login, pass);
+			if (user != null) {
+				session.setAttribute("user", user);
+				if (user.getRole() == 1) {
+					session.setAttribute("prevAction", "login_admin");
+					return PAGE_SUCSESS_RD;
+				} else {
+					session.setAttribute("prevAction", "login_user");
+					return PAGE_SUCSESS_RD;
+				}
+			} else {
 				request.setAttribute("errorLogin", "Incorrect password");
-				page = "/login.jsp";
+				return PAGE_LOGIN;
 			}
 		} else {
-			request.setAttribute("errorLogin", "Incorrect login");
-			page = "/login.jsp";
+			request.setAttribute("errorLogin", "Login incorrect or not exist");
+			return PAGE_LOGIN;
 		}
-		return page;
 	}
 }

@@ -2,7 +2,6 @@ package by.htp.login.dao.database;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,107 +9,140 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import by.htp.login.beans.Author;
 import by.htp.login.dao.AuthorDao;
 
-public class AuthorDaoimpl implements AuthorDao{
+public class AuthorDaoimpl extends AbstractDaoMySqlImpl implements AuthorDao{
+	
+	static final String INSERT_INTO_AUTHOR = "INSERT INTO author (name, surname, birth_date) values (?, ?, ?)";
+	static final String SELECT_AUTHOR_ID = "SELECT * FROM author WHERE author_id = ?;";
+	static final String UPDATE_AUTHOR = "UPDATE author SET name = ?, surname = ?, birth_date = ? WHERE author_id = ?";
+	static final String DELETE_AUTHOR = "DELETE FROM author WHERE author_id = ?";
+	static final String SELECT_AUTHOR_ALL = "SELECT * FROM author;";
+	static final String SELET_AUTHOR_LIKE = "SELECT * FROM author WHERE surname like concat('%', ?,'%');";
 
 	@Override
 	public void create(Author t) throws IOException {
-		// TODO Auto-generated method stub
+		
+		try (Connection cn = wcn.getConnection(); PreparedStatement ps = cn.prepareStatement(INSERT_INTO_AUTHOR)){
+			
+			ps.setString(1, t.getName());
+			ps.setString(2, t.getSurName());
+			ps.setString(3, t.getBirthDate().toString());
+			ps.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		
 	}
 
 	@Override
-	public Author read(int id) throws NumberFormatException, IOException, ParseException {
+	public Author read(int id) throws IOException, ParseException {
 		Author author = null;
-		Connection connection = null;
-		try {
-			String url = getConnectInitValue()[0];
-			String login = getConnectInitValue()[1];
-			String pass = getConnectInitValue()[2];
-
-			connection = DriverManager.getConnection(url, login, pass);
-
-			String sql = "SELECT * FROM author WHERE author_id = ?;";
-			PreparedStatement st = connection.prepareStatement(sql);
+		ResultSet rs = null;
+		try (Connection cn = wcn.getConnection(); PreparedStatement st = cn.prepareStatement(SELECT_AUTHOR_ID);){
 			st.setInt(1, id);
-			ResultSet rs = st.executeQuery();
+			rs = st.executeQuery();
 			rs.next();
-			author = new Author(rs.getInt("author_id"), rs.getString("name"), rs.getString("surname"),
-					rs.getDate("birth_date"));
+			author = buildAuthor(rs);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
+			if (rs!=null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
-			} catch (SQLException e) {
-				e.printStackTrace();
 			}
 		}
 		return author;
 	}
 
-	@Override
-	public Author read(String s) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public void update(Author t) {
-		// TODO Auto-generated method stub
 		
+		try (Connection cn = wcn.getConnection(); PreparedStatement ps = cn.prepareStatement(UPDATE_AUTHOR)){
+			
+			ps.setString(1, t.getName());
+			ps.setString(2, t.getSurName());
+			ps.setString(3, t.getBirthDate().toString());
+			ps.setInt(4, t.getId());
+			ps.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
-	public void delete(int id) throws NumberFormatException, IOException, ParseException {
-		// TODO Auto-generated method stub
-		
+	public void delete(int id) throws IOException, ParseException {
+		try (Connection cn = wcn.getConnection(); PreparedStatement ps = cn.prepareStatement(DELETE_AUTHOR)){
+			
+			ps.setInt(1, id);
+			ps.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public List<Author> readAll() {
 		List<Author> list = new ArrayList<>();
-		Connection connection = null;
-		try {
-			String url = getConnectInitValue()[0];
-			String login = getConnectInitValue()[1];
-			String pass = getConnectInitValue()[2];
+		ResultSet rs = null;
+		try (Connection cn = wcn.getConnection();Statement st = cn.createStatement()){
 
-			connection = DriverManager.getConnection(url, login, pass);
-
-			String sql = "SELECT * FROM author;";
-			Statement st = connection.createStatement();
-			ResultSet rs = st.executeQuery(sql);
+			rs = st.executeQuery(SELECT_AUTHOR_ALL);
 			while (rs.next()) {
-				list.add(new Author(rs.getInt("author_id"),rs.getString("name"),rs.getString("surname"),rs.getDate("birth_date")));
+				list.add(buildAuthor(rs));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
+			if(rs!=null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
-			} catch (SQLException e) {
-				e.printStackTrace();
 			}
 		}
 		return list;
 	}
 
-	private String[] getConnectInitValue() {
-		ResourceBundle rb = ResourceBundle.getBundle("db_config");
-		String dbURL = rb.getString("db.url");
-		String user = rb.getString("db.login");
-		String pass = rb.getString("db.pass");
-		String driver = rb.getString("db.driver.name");
-
-		return new String[] { dbURL, user, pass, driver };
+	private Author buildAuthor(ResultSet rs) throws SQLException {
+		return new Author(rs.getInt(SQL_AUTHOR_ID), rs.getString(SQL_AUTHOR_NAME), rs.getString(SQL_AUTHOR_SURNAME),
+				rs.getDate(SQL_AUTHOR_BIRTH_DATE));
 	}
+
+	@Override
+	public List<Author> findAuthor(String surname) {
+		List<Author> list = new ArrayList<>();
+		ResultSet rs = null;
+		try(Connection cn = wcn.getConnection(); PreparedStatement ps = cn.prepareStatement(SELET_AUTHOR_LIKE)){
+			
+			ps.setString(1, surname);
+			rs = ps.executeQuery();
+			while(rs.next()) {
+				list.add(buildAuthor(rs));
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if(rs!=null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return list;
+	}
+
 }

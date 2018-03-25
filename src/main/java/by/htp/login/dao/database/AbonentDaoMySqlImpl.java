@@ -2,175 +2,163 @@ package by.htp.login.dao.database;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import by.htp.login.beans.Abonent;
-import by.htp.login.beans.Entity;
 import by.htp.login.dao.AbonentDao;
 
-public class AbonentDaoMySqlImpl implements AbonentDao {
+public class AbonentDaoMySqlImpl extends AbstractDaoMySqlImpl implements AbonentDao {
 
-	{
-		try {
-			Class.forName(getConnectInitValue()[3]);
-		} catch (ClassNotFoundException e) {
+	static final String INSERT_INTO_ABONENT = "INSERT INTO abonent (name, lastname, surname, birth_date, "
+			+ "number, e_mail, registration_date) values (?, ?, ?, ?, ?, ?, ?)";
+	static final String SELECT_ABONENT = "SELECT * FROM abonent WHERE id = ?;";
+	static final String SELECT_ABONENT_ALL = "SELECT * from abonent;";
+	static final String DELETE_ABONENT = "DELETE FROM abonent WHERE abonent_id = ?";
+	static final String UPDATE_ABONENT = "UPDATE abonent SET name = ?, surname = ?, lastname = ?, birth_date = ?, number = ?, e_mail = ? WHERE abonent_id =?";
+	static final String SELECT_ABONENT_ID = "SELECT * FROM abonent WHERE abonent_id = ?;";
+
+	@Override
+	public void create(Abonent t){
+
+		try (Connection cn = wcn.getConnection(); PreparedStatement ps = cn.prepareStatement(INSERT_INTO_ABONENT)) {
+
+			ps.setString(1, t.getName());
+			ps.setString(2, t.getLastname());
+			ps.setString(3, t.getSurname());
+			ps.setString(4, t.getBirthDate().toString());
+			ps.setString(5, t.getNumber());
+			ps.setString(6, t.getEMail());
+			ps.setString(7, t.getRegistrationDate().toString());
+			ps.executeUpdate();
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void create(Abonent entity) throws IOException {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public Abonent read(int id) throws NumberFormatException, IOException, ParseException {
-		// TODO Auto-generated method stub
-		return null;
+	public Abonent read(int id) throws IOException, ParseException {
+		Abonent abonent = null;
+		ResultSet rs = null;
+		try (Connection cn = wcn.getConnection(); PreparedStatement ps = cn.prepareStatement(SELECT_ABONENT_ID)) {
+
+			ps.setInt(1, id);
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				abonent = new Abonent(rs.getInt(SQL_ABONENT_ID), rs.getString(SQL_ABONENT_NAME),
+						rs.getString(SQL_ABONENT_LASTNAME), rs.getString(SQL_AUTHOR_SURNAME),
+						rs.getDate(SQL_AUTHOR_BIRTH_DATE), rs.getString(SQL_ABONENT_NUMBER),
+						rs.getString(SQL_ABONENT_EMAIL), rs.getDate(SQL_ABONENT_REG_DATE));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return abonent;
 	}
 
 	@Override
-	public void update(Abonent entity) {
-		// TODO Auto-generated method stub
+	public void update(Abonent t) {
+		try (Connection cn = wcn.getConnection(); PreparedStatement ps = cn.prepareStatement(UPDATE_ABONENT)) {
+
+			ps.setString(1, t.getName());
+			ps.setString(2, t.getSurname());
+			ps.setString(3, t.getLastname());
+			ps.setString(4, t.getBirthDate().toString());
+			ps.setString(5, t.getNumber());
+			ps.setString(6, t.getEMail());
+			ps.setInt(7, t.getId());
+			ps.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 	}
 
 	@Override
-	public void delete(int id) throws NumberFormatException, IOException, ParseException {
-		// TODO Auto-generated method stub
+	public void delete(int id) throws IOException, ParseException {
+		try (Connection cn = wcn.getConnection(); PreparedStatement ps = cn.prepareStatement(DELETE_ABONENT)) {
+
+			ps.setInt(1, id);
+			ps.executeUpdate();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
 	}
 
 	@Override
 	public List<Abonent> readAll() {
 		List<Abonent> list = new ArrayList<>();
-		String request = "SELECT * from abonent;";
-		Connection connection = null;
-		try {
-			String url = getConnectInitValue()[0];
-			String login = getConnectInitValue()[1];
-			String pass = getConnectInitValue()[2];
+		ResultSet rs = null;
+		try (Connection cn = wcn.getConnection(); Statement st = cn.createStatement()) {
 
-			connection = DriverManager.getConnection(url, login, pass);
-
-			Statement st = connection.createStatement();
-			ResultSet rs = st.executeQuery(request);
+			rs = st.executeQuery(SELECT_ABONENT_ALL);
 			while (rs.next()) {
-				Abonent abonent = new Abonent();
-				abonent.setId(rs.getInt("abonent_id"));
-				abonent.setName(rs.getString("name"));
-				abonent.setSurName(rs.getString("surname"));
-				abonent.setRegistrationDate(rs.getDate("registration_date"));
-				list.add(abonent);
-			}
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return list;
-	}
-
-	@Override
-	public List<String> readTwoOrMore() {
-		List<String> list = new ArrayList<>();
-		String sql = "select abonent.name, abonent.surname, count(books_read.abonent) from books_read join abonent on books_read.abonent = abonent.abonent_id group by books_read.abonent having count(books_read.abonent)>1;";
-		Connection connection = null;
-		try {
-			String url = getConnectInitValue()[0];
-			String login = getConnectInitValue()[1];
-			String pass = getConnectInitValue()[2];
-
-			connection = DriverManager.getConnection(url, login, pass);
-			Statement st = connection.createStatement();
-			ResultSet rs = st.executeQuery(sql);
-
-			while (rs.next()) {
-				list.add(rs.getString("abonent.name") + " " + rs.getString("abonent.surname") + " read "
-						+ rs.getInt("count(books_read.abonent)") + " books");
+				list.add(new Abonent(rs.getString(SQL_ABONENT_NAME), rs.getString(SQL_ABONENT_LASTNAME),
+						rs.getString(SQL_AUTHOR_SURNAME), rs.getDate(SQL_AUTHOR_BIRTH_DATE),
+						rs.getString(SQL_ABONENT_NUMBER), rs.getString(SQL_ABONENT_EMAIL),
+						rs.getDate(SQL_ABONENT_REG_DATE)));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
 		return list;
 	}
 
 	@Override
-	public List<String> readLessThenTwo() {
-		List<String> list = new ArrayList<>();
-		String sql = "select abonent.name, abonent.surname, abonent.registration_date, "
-				+ "count(books_read.abonent) from books_read join abonent on books_read.abonent = abonent.abonent_id "
-				+ "group by books_read.abonent having count(books_read.abonent)<=2;";
-		Connection connection = null;
-		try {
-			String url = getConnectInitValue()[0];
-			String login = getConnectInitValue()[1];
-			String pass = getConnectInitValue()[2];
+	public int createAbonent(Abonent abonent) {
+		ResultSet rs = null;
+		int id = 0;
+		try (Connection cn = wcn.getConnection(); PreparedStatement ps = cn.prepareStatement(INSERT_INTO_ABONENT, Statement.RETURN_GENERATED_KEYS)) {
 
-			connection = DriverManager.getConnection(url, login, pass);
-			Statement st = connection.createStatement();
-			ResultSet rs = st.executeQuery(sql);
-
-			while (rs.next()) {
-				list.add(rs.getString("abonent.name") + " " + rs.getString("abonent.surname") + " read "
-						+ rs.getInt("count(books_read.abonent)") + " books");
+			ps.setString(1, abonent.getName());
+			ps.setString(2, abonent.getSurname());
+			ps.setString(3, abonent.getLastname());
+			ps.setString(4, abonent.getBirthDate().toString());
+			ps.setString(5, abonent.getNumber());
+			ps.setString(6, abonent.getEMail());
+			ps.setString(7, abonent.getRegistrationDate().toString());
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			if(rs.next()) {
+			id = rs.getInt(1);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
-		return list;
+		return id;
 	}
-
-	private String[] getConnectInitValue() {
-
-		ResourceBundle rs = ResourceBundle.getBundle("db_config");
-		String dbURL = rs.getString("db.url");
-		String login = rs.getString("db.login");
-		String pass = rs.getString("db.pass");
-		String drvName = rs.getString("db.driver.name");
-
-		return new String[] { dbURL, login, pass, drvName };
-
-	}
-
-	@Override
-	public Abonent read(String s) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
 }

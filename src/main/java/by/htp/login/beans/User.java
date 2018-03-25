@@ -1,19 +1,48 @@
 package by.htp.login.beans;
 
-public class User extends Entity{
+import java.io.Serializable;
 
+public class User extends Entity implements Serializable{
+	
+	private static final long serialVersionUID = 4908874150936828921L;
 	private String login;
 	private String password;
+	private int role;
+	private Abonent abonent;
 
 	public User() {
 		super();
 	}
 	
+	
+
+	public User(int id, String login, String password, int role) {
+		super(id);
+		this.login = login;
+		this.password = password;
+		this.role = role;
+	}
+	
+	public User(int id, String login, String password, int role, Abonent abonent) {
+		super(id);
+		this.login = login;
+		this.password = password;
+		this.role = role;
+		this.abonent = abonent;
+	}
+	
+	public User(String login, String password, int role) {
+		this.login = login;
+		this.password = password;
+		this.role = role;
+	}
+	
 	public User(String login, String password) {
-		super();
 		this.login = login;
 		this.password = password;
 	}
+
+
 
 	public String getLogin() {
 		return login;
@@ -27,6 +56,32 @@ public class User extends Entity{
 	public void setPassword(String password) {
 		this.password = password;
 	}
+	
+	
+
+	public int getRole() {
+		return role;
+	}
+
+
+
+	public void setRole(int role) {
+		this.role = role;
+	}
+
+
+
+	public Abonent getAbonent() {
+		return abonent;
+	}
+
+
+
+	public void setAbonent(Abonent abonent) {
+		this.abonent = abonent;
+	}
+
+
 
 	@Override
 	public int hashCode() {
@@ -34,6 +89,7 @@ public class User extends Entity{
 		int result = 1;
 		result = prime * result + ((login == null) ? 0 : login.hashCode());
 		result = prime * result + ((password == null) ? 0 : password.hashCode());
+		result = prime * result + role;
 		return result;
 	}
 
@@ -56,14 +112,13 @@ public class User extends Entity{
 				return false;
 		} else if (!password.equals(other.password))
 			return false;
+		if (role != other.role)
+			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "User [login=" + login + ", password=" + password + "]";
-	}
-	
-	
-	
+		return "User [login=" + login + ", password=" + password + ", role=" + role + "]";
+	}	
 }
