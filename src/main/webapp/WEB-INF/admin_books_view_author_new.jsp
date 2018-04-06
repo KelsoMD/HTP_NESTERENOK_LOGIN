@@ -163,7 +163,7 @@
 										<td class="body-item mbr-fonts-style display-7">${item.getAuthor().getName()+=' '+=item.getAuthor().getSurName()}</td>
 										<td class="body-item mbr-fonts-style display-7">${item.getPublishDate()}</td>
 										<td class="body-item mbr-fonts-style display-7"><a
-											href="http://localhost:8080/login/MainServlet?action=delete_book&book_id=${item.getId()}&&prevAuthor=${prevAuthor}&search=authors">DELETE </a><a
+											href="http://localhost:8080/login/MainServlet?action=delete_book&book_id=${item.getId()}&prevAuthor=${prevAuthor}&search=authors">DELETE </a><a
 											href="http://localhost:8080/login/MainServlet?action=edit_book&book_id=${item.getId()}">EDIT </a>
 											<a
 											href="http://localhost:8080/login/MainServlet?action=update_count&book_id=${item.getId()}&prevAuthor=${prevAuthor}&search=authors">ADD</a>

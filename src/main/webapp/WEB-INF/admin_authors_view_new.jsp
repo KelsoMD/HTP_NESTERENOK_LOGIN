@@ -145,7 +145,7 @@
 									<td class="body-item mbr-fonts-style display-7">${item.getSurName()}</td>
 									<td class="body-item mbr-fonts-style display-7">${item.getName()}</td>
 									<td class="body-item mbr-fonts-style display-7">${item.getBirthDate()}</td>
-									<td class="body-item mbr-fonts-style display-7"><a href="http://localhost:8080/login/MainServlet?action=delete_author&author_id=${item.getId()}$prevAuthor=${prevAuthor}" type="submit"
+									<td class="body-item mbr-fonts-style display-7"><a href="http://localhost:8080/login/MainServlet?action=delete_author&author_id=${item.getId()}&prevAuthor=${prevAuthor}" type="submit"
 								>DELETE </a><a href="http://localhost:8080/login/MainServlet?action=edit_author&author_id=${item.getId()}">EDIT</a></td>		
 								</tr>
 							</c:forEach>
